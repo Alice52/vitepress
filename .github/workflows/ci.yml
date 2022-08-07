@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        node_version: [16.x]
+        os: [ubuntu-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PNPM
+      - uses: pnpm/action-setup@v2
+
+      - name: Setup Node With Version[${{ matrix.node_version }}]
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+          cache: pnpm
+
+      - name: Install & Build & Lint & TypeCheck
+        run: |
+          pnpm i
+          pnpm run build
+          pnpm run lint
+          pnpm run typecheck
